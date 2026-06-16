@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rotate & Flip Image — Free Online Tool | ToolBaron</title>
+<meta name="description" content="Free online tool to rotate and flip images. Rotate 90/180/270 degrees, flip horizontally or vertically. 100% browser-based.">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav><a href="/" class="logo">Tool<span>Baron</span></a><div class="nav-links"><a href="https://toolbaron.com">More Tools</a></div></nav>
+<div class="tool-container">
+  <div class="tool-header"><h1>↻ Rotate & Flip Image</h1><p>Rotate or mirror images — instant, no upload</p></div>
+  <div class="ad-unit">AdSense</div>
+  <div class="upload-zone" id="dropZone"><span class="icon">📁</span><div class="text">Drop image or click to browse</div></div>
+  <input type="file" id="fileInput" accept="image/*" style="display:none">
+  <div id="controls" style="display:none;margin-top:16px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      <button class="btn btn-primary" onclick="rotate(90)">↻ 90°</button>
+      <button class="btn btn-primary" onclick="rotate(180)">↻ 180°</button>
+      <button class="btn btn-primary" onclick="rotate(270)">↻ 270°</button>
+      <button class="btn btn-primary" onclick="flip('h')">↔ Flip H</button>
+      <button class="btn btn-primary" onclick="flip('v')">↕ Flip V</button>
+      <button class="btn" onclick="reset()" style="background:#f1f5f9">Reset</button>
+    </div>
+    <div class="preview-row">
+      <div class="preview-box"><div class="label">Original</div><img id="orig" alt="Original"></div>
+      <div class="preview-box"><div class="label">Result</div><img id="result" alt="Result"></div>
+    </div>
+    <button class="btn btn-green btn-block" id="dlBtn" style="display:none;margin-top:16px">⬇ Download</button>
+  </div>
+</div>
+<footer><p><a href="privacy.html">Privacy</a> · &copy; 2026 ToolBaron</p></footer>
+<div class="toast" id="toast"></div>
+<script>
+const dz=document.getElementById('dropZone'),fi=document.getElementById('fileInput'),c=document.getElementById('controls'),orig=document.getElementById('orig'),res=document.getElementById('result'),dl=document.getElementById('dlBtn'),toast=document.getElementById('toast');
+let file,srcBlob,angle=0,fh=false,fv=false;
+function t(m){toast.textContent=m;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2000);}
+dz.addEventListener('click',()=>fi.click());fi.addEventListener('change',e=>{if(e.target.files[0])load(e.target.files[0]);});
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag-over');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag-over'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag-over');if(e.dataTransfer.files[0])load(e.dataTransfer.files[0]);});
+function load(f){file=f;c.style.display='block';orig.src=URL.createObjectURL(f);angle=0;fh=false;fv=false;doEdit();}
+function doEdit(){
+  const img=new Image();img.onload=()=>{
+    const cv=document.createElement('canvas');let w=img.width,h=img.height;
+    if(angle===90||angle===270){cv.width=h;cv.height=w;}else{cv.width=w;cv.height=h;}
+    const ctx=cv.getContext('2d');ctx.translate(cv.width/2,cv.height/2);
+    ctx.rotate(angle*Math.PI/180);ctx.scale(fh?-1:1,fv?-1:1);
+    ctx.drawImage(img,-w/2,-h/2,w,h);
+    cv.toBlob(b=>{srcBlob=b;res.src=URL.createObjectURL(b);dl.style.display='block';},file.type||'image/jpeg',0.9);
+  };img.src=orig.src;
+}
+function rotate(a){angle=(angle+a)%360;doEdit();}
+function flip(d){if(d==='h')fh=!fh;else fv=!fv;doEdit();}
+function reset(){angle=0;fh=false;fv=false;doEdit();t('Reset!');}
+dl.addEventListener('click',()=>{if(!srcBlob)return;const a=document.createElement('a');a.href=URL.createObjectURL(srcBlob);a.download='edited.'+(file.type.split('/')[1]||'jpg');a.click();t('Downloaded!');});
+</script>
+</body>
+</html>

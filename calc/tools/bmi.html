@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BMI Calculator — Free Online Calculator | ToolBaron</title>
+<meta name="description" content="Free online BMI calculator. Calculate your Body Mass Index from weight and height. Instant results with health category. 100% browser-based.">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<nav><a href="https://toolbaron.com" class="logo">Tool<span>Baron</span></a></nav>
+
+<div class="tool-container">
+  <div class="tool-header">
+    <h1>⚖️ BMI Calculator</h1>
+    <p>Body Mass Index — enter weight and height for instant results</p>
+  </div>
+
+  <div class="ad-unit">AdSense</div>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px">
+
+    <!-- Metric inputs -->
+    <div id="metric-inputs" style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px">
+      <div style="flex:1;min-width:200px">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Weight (kg)</label>
+        <input type="number" id="weight" placeholder="e.g. 70" step="0.1" min="0" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+      </div>
+      <div style="flex:1;min-width:200px">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Height (cm)</label>
+        <input type="number" id="height" placeholder="e.g. 170" step="0.1" min="0" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+      </div>
+    </div>
+
+    <!-- Unit toggle -->
+    <div style="display:flex;gap:16px;margin-bottom:16px">
+      <label style="font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px">
+        <input type="radio" name="unit" value="metric" checked onchange="toggleUnit()"> <span>Metric (kg / cm)</span>
+      </label>
+      <label style="font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px">
+        <input type="radio" name="unit" value="imperial" onchange="toggleUnit()"> <span>Imperial (lbs / ft-in)</span>
+      </label>
+    </div>
+
+    <!-- Imperial inputs (hidden by default) -->
+    <div id="imperial-inputs" style="display:none;gap:16px;flex-wrap:wrap;margin-bottom:16px">
+      <div style="flex:1;min-width:200px">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Weight (lbs)</label>
+        <input type="number" id="weight-lbs" placeholder="e.g. 154" step="0.1" min="0" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+      </div>
+      <div style="flex:1;min-width:100px">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Height (ft)</label>
+        <input type="number" id="height-ft" placeholder="5" min="0" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+      </div>
+      <div style="flex:1;min-width:100px">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Height (in)</label>
+        <input type="number" id="height-in" placeholder="7" min="0" max="11" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-block" onclick="calcBMI()">Calculate BMI</button>
+
+    <div id="bmi-results" style="display:none;margin-top:20px;text-align:center">
+      <div style="font-size:14px;color:var(--muted);margin-bottom:4px">Your BMI</div>
+      <div id="bmi-value" style="font-size:42px;font-weight:800"></div>
+      <div id="bmi-category" style="font-size:16px;font-weight:600;margin-top:8px"></div>
+      <div style="margin-top:16px;display:flex;border-radius:8px;overflow:hidden;height:24px">
+        <div style="width:18.5%;background:#3b82f6" title="Underweight"></div>
+        <div style="width:6.4%;background:#10b981" title="Normal"></div>
+        <div style="width:5%;background:#f59e0b" title="Overweight"></div>
+        <div style="width:70.1%;background:#ef4444" title="Obese"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px">
+        <span>0</span><span>18.5</span><span>24.9</span><span>29.9</span><span>40+</span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px">Underweight &middot; Normal &middot; Overweight &middot; Obese</div>
+    </div>
+  </div>
+
+  <div class="ad-unit">AdSense</div>
+</div>
+
+<footer><p><a href="../privacy.html">Privacy</a> · &copy; 2026 ToolBaron</p></footer>
+
+<script>
+function toggleUnit() {
+  var isImperial = document.querySelector('input[name="unit"]:checked').value === 'imperial';
+  document.getElementById('metric-inputs').style.display = isImperial ? 'none' : 'flex';
+  document.getElementById('imperial-inputs').style.display = isImperial ? 'flex' : 'none';
+  document.getElementById('bmi-results').style.display = 'none';
+}
+
+function calcBMI() {
+  var isImperial = document.querySelector('input[name="unit"]:checked').value === 'imperial';
+  var weightKg, heightCm;
+
+  if (isImperial) {
+    var lbs = parseFloat(document.getElementById('weight-lbs').value);
+    var ft = parseFloat(document.getElementById('height-ft').value) || 0;
+    var inch = parseFloat(document.getElementById('height-in').value) || 0;
+    if (isNaN(lbs) || lbs <= 0 || (ft === 0 && inch === 0)) {
+      document.getElementById('bmi-value').textContent = '—';
+      document.getElementById('bmi-category').textContent = 'Please enter weight and height.';
+      document.getElementById('bmi-results').style.display = 'block';
+      return;
+    }
+    weightKg = lbs * 0.453592;
+    heightCm = (ft * 12 + inch) * 2.54;
+  } else {
+    weightKg = parseFloat(document.getElementById('weight').value);
+    heightCm = parseFloat(document.getElementById('height').value);
+  }
+
+  var resultsDiv = document.getElementById('bmi-results');
+
+  if (isNaN(weightKg) || isNaN(heightCm) || weightKg <= 0 || heightCm <= 0) {
+    document.getElementById('bmi-value').textContent = '—';
+    document.getElementById('bmi-category').textContent = 'Please enter valid weight and height.';
+    resultsDiv.style.display = 'block';
+    return;
+  }
+
+  var heightM = heightCm / 100;
+  var bmi = weightKg / (heightM * heightM);
+  var category, color;
+
+  if (bmi < 18.5) { category = 'Underweight'; color = '#3b82f6'; }
+  else if (bmi < 25) { category = 'Normal weight'; color = '#10b981'; }
+  else if (bmi < 30) { category = 'Overweight'; color = '#f59e0b'; }
+  else { category = 'Obese'; color = '#ef4444'; }
+
+  document.getElementById('bmi-value').textContent = bmi.toFixed(1);
+  document.getElementById('bmi-value').style.color = color;
+  document.getElementById('bmi-category').textContent = category;
+  document.getElementById('bmi-category').style.color = color;
+  resultsDiv.style.display = 'block';
+}
+</script>
+</body>
+</html>

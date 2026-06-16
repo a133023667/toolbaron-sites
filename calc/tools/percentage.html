@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Percentage Calculator — Free Online Calculator | ToolBaron</title>
+<meta name="description" content="Free online percentage calculator. Find what is X% of Y, X is what % of Y, and percentage change. Instant results, 100% browser-based.">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<nav><a href="https://toolbaron.com" class="logo">Tool<span>Baron</span></a></nav>
+
+<div class="tool-container">
+  <div class="tool-header">
+    <h1>💯 Percentage Calculator</h1>
+    <p>Quick percentage math — no sign-up needed</p>
+  </div>
+
+  <div class="ad-unit">AdSense</div>
+
+  <!-- Calculate X% of Y -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px">
+    <h3 style="font-size:16px;margin-bottom:16px">What is X% of Y?</h3>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end">
+      <div style="flex:1;min-width:120px">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Percent (%)</label>
+        <input type="number" id="pct-x" placeholder="e.g. 20" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+      </div>
+      <span style="font-size:20px;color:var(--muted);padding-bottom:10px">of</span>
+      <div style="flex:1;min-width:120px">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Number</label>
+        <input type="number" id="pct-y" placeholder="e.g. 200" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+      </div>
+      <button class="btn btn-primary" onclick="calcPercentOf()" style="white-space:nowrap">Calculate</button>
+    </div>
+    <div id="result-pct-of" style="margin-top:16px;font-size:18px;font-weight:700;min-height:28px"></div>
+  </div>
+
+  <!-- Calculate X is what % of Y -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px">
+    <h3 style="font-size:16px;margin-bottom:16px">X is what percent of Y?</h3>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end">
+      <div style="flex:1;min-width:120px">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">X</label>
+        <input type="number" id="is-x" placeholder="e.g. 50" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+      </div>
+      <span style="font-size:20px;color:var(--muted);padding-bottom:10px">is what % of</span>
+      <div style="flex:1;min-width:120px">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Y</label>
+        <input type="number" id="is-y" placeholder="e.g. 200" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+      </div>
+      <button class="btn btn-primary" onclick="calcIsWhatPercentOf()" style="white-space:nowrap">Calculate</button>
+    </div>
+    <div id="result-is-pct" style="margin-top:16px;font-size:18px;font-weight:700;min-height:28px"></div>
+  </div>
+
+  <!-- Percentage Change -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px">
+    <h3 style="font-size:16px;margin-bottom:16px">Percentage Change (from A to B)</h3>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end">
+      <div style="flex:1;min-width:120px">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">From (A)</label>
+        <input type="number" id="chg-a" placeholder="e.g. 100" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+      </div>
+      <span style="font-size:20px;color:var(--muted);padding-bottom:10px">&#8594;</span>
+      <div style="flex:1;min-width:120px">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">To (B)</label>
+        <input type="number" id="chg-b" placeholder="e.g. 150" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+      </div>
+      <button class="btn btn-primary" onclick="calcPctChange()" style="white-space:nowrap">Calculate</button>
+    </div>
+    <div id="result-pct-change" style="margin-top:16px;font-size:18px;font-weight:700;min-height:28px"></div>
+  </div>
+
+  <div class="ad-unit">AdSense</div>
+</div>
+
+<footer><p><a href="../privacy.html">Privacy</a> · &copy; 2026 ToolBaron</p></footer>
+
+<script>
+function calcPercentOf() {
+  const x = parseFloat(document.getElementById('pct-x').value);
+  const y = parseFloat(document.getElementById('pct-y').value);
+  const el = document.getElementById('result-pct-of');
+  if (isNaN(x) || isNaN(y)) { el.textContent = 'Please enter both numbers.'; return; }
+  el.textContent = x + '% of ' + y + ' = ' + ((x / 100) * y).toFixed(2);
+}
+
+function calcIsWhatPercentOf() {
+  const x = parseFloat(document.getElementById('is-x').value);
+  const y = parseFloat(document.getElementById('is-y').value);
+  const el = document.getElementById('result-is-pct');
+  if (isNaN(x) || isNaN(y)) { el.textContent = 'Please enter both numbers.'; return; }
+  if (y === 0) { el.textContent = 'Y cannot be zero.'; return; }
+  el.textContent = x + ' is ' + ((x / y) * 100).toFixed(2) + '% of ' + y;
+}
+
+function calcPctChange() {
+  const a = parseFloat(document.getElementById('chg-a').value);
+  const b = parseFloat(document.getElementById('chg-b').value);
+  const el = document.getElementById('result-pct-change');
+  if (isNaN(a) || isNaN(b)) { el.textContent = 'Please enter both numbers.'; return; }
+  if (a === 0) { el.textContent = 'Starting value cannot be zero.'; return; }
+  const change = ((b - a) / Math.abs(a)) * 100;
+  const dir = change >= 0 ? 'increase' : 'decrease';
+  el.textContent = 'From ' + a + ' to ' + b + ' is a ' + Math.abs(change).toFixed(2) + '% ' + dir + '.';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lorem Ipsum Generator — Free Online Text Tool | ToolBaron</title>
+<meta name="description" content="Generate Lorem Ipsum placeholder text. Choose the number of paragraphs and copy to clipboard. Free online tool.">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav><a href="/" class="logo">Tool<span>Baron</span></a></nav>
+<div class="tool-container">
+  <div class="tool-header"><h1>Lorem Ipsum Generator</h1><p>Generate placeholder text for your designs, mockups, and layouts</p></div>
+  <div class="ad-unit">AdSense</div>
+  <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:20px">
+    <label style="font-size:14px;font-weight:500">Paragraphs:</label>
+    <select id="count" style="padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:14px">
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3" selected>3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="15">15</option>
+      <option value="20">20</option>
+    </select>
+    <button class="btn btn-primary" onclick="generate()">Generate</button>
+    <button class="btn btn-green" onclick="copyText()">Copy</button>
+  </div>
+  <div id="output" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;min-height:120px;font-size:15px;line-height:1.8;white-space:pre-wrap"></div>
+</div>
+<footer><p><a href="privacy.html">Privacy</a> &middot; &copy; 2026 ToolBaron</p></footer>
+<script>
+const LOREM_WORDS = [
+  "lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit",
+  "sed", "do", "eiusmod", "tempor", "incididunt", "ut", "labore", "et", "dolore",
+  "magna", "aliqua", "ut", "enim", "ad", "minim", "veniam", "quis", "nostrud",
+  "exercitation", "ullamco", "laboris", "nisi", "ut", "aliquip", "ex", "ea",
+  "commodo", "consequat", "duis", "aute", "irure", "dolor", "in", "reprehenderit",
+  "in", "voluptate", "velit", "esse", "cillum", "dolore", "eu", "fugiat", "nulla",
+  "pariatur", "excepteur", "sint", "occaecat", "cupidatat", "non", "proident",
+  "sunt", "in", "culpa", "qui", "officia", "deserunt", "mollit", "anim", "id",
+  "est", "laborum", "sed", "ut", "perspiciatis", "unde", "omnis", "iste", "natus",
+  "error", "sit", "voluptatem", "accusantium", "doloremque", "laudantium",
+  "totam", "rem", "aperiam", "eaque", "ipsa", "quae", "ab", "illo", "inventore"
+];
+
+function generateParagraph() {
+  const len = 40 + Math.floor(Math.random() * 80);
+  let words = [];
+  for (let i = 0; i < len; i++) {
+    words.push(LOREM_WORDS[Math.floor(Math.random() * LOREM_WORDS.length)]);
+  }
+  let sentence = words.join(' ');
+  sentence = sentence.charAt(0).toUpperCase() + sentence.slice(1) + '.';
+  return sentence;
+}
+
+function generate() {
+  const count = parseInt(document.getElementById('count').value);
+  let paragraphs = [];
+  for (let i = 0; i < count; i++) {
+    let para = '';
+    const sentences = 3 + Math.floor(Math.random() * 5);
+    for (let j = 0; j < sentences; j++) {
+      para += generateParagraph() + ' ';
+    }
+    paragraphs.push(para.trim());
+  }
+  const text = paragraphs.join('\n\n');
+  document.getElementById('output').textContent = text;
+  window._loremText = text;
+}
+
+function copyText() {
+  if (!window._loremText) generate();
+  navigator.clipboard.writeText(window._loremText).then(() => {
+    showToast('Copied to clipboard!');
+  });
+}
+
+function showToast(msg) {
+  let toast = document.querySelector('.toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.className = 'toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+generate();
+</script>
+</body>
+</html>

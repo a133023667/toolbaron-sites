@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Converter — Convert JPEG, PNG, WebP, AVIF, BMP Online</title>
+<meta name="description" content="Free online image converter. Convert between JPEG, PNG, WebP, AVIF, BMP. No upload, 100% private.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav><a href="/" class="logo">Tool<span>Baron</span></a><div class="nav-links"><a href="/blog/">Blog</a><a href="/about.html">About</a></div></nav>
+<div class="tool-container">
+  <div class="tool-header"><h1>🔄 Image Converter</h1><p>Convert between image formats instantly — no upload</p></div>
+  <div class="ad-unit">AdSense — Below Title</div>
+  <div class="upload-zone" id="dropZone">
+    <span class="icon">📁</span><div class="text">Drop image or click to browse</div><div class="hint">JPEG, PNG, WebP, AVIF, BMP</div>
+  </div>
+  <input type="file" id="fileInput" accept="image/*" style="display:none">
+  <div id="controls" style="display:none;margin-top:16px">
+    <div style="margin-bottom:12px">
+      <label style="font-weight:500;font-size:14px">Convert to:</label>
+      <select id="format" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;margin-left:8px">
+        <option value="image/jpeg">JPEG</option><option value="image/png">PNG</option><option value="image/webp">WebP</option>
+      </select>
+    </div>
+    <div class="preview-row">
+      <div class="preview-box"><div class="label">Original</div><img id="orig" alt="Original"><div class="file-info" id="origInfo"></div></div>
+      <div class="preview-box"><div class="label">Converted</div><img id="conv" alt="Converted"><div class="file-info" id="convInfo"></div></div>
+    </div>
+    <button class="btn btn-green btn-block" id="dlBtn" style="display:none;margin-top:16px">⬇ Download Converted Image</button>
+  </div>
+</div>
+<footer><p><a href="/privacy.html">Privacy Policy</a> · <a href="/about.html">About</a></p></footer>
+<div class="toast" id="toast"></div>
+<script>
+const dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),controls=document.getElementById('controls'),format=document.getElementById('format');
+const orig=document.getElementById('orig'),conv=document.getElementById('conv'),origInfo=document.getElementById('origInfo'),convInfo=document.getElementById('convInfo'),dlBtn=document.getElementById('dlBtn'),toast=document.getElementById('toast');
+let file,resultBlob;
+function t(m){toast.textContent=m;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2000);}
+dropZone.addEventListener('click',()=>fileInput.click());
+fileInput.addEventListener('change',e=>{if(e.target.files[0])loadFile(e.target.files[0]);});
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over');});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('drag-over');if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0]);});
+function loadFile(f){
+  file=f;controls.style.display='block';orig.src=URL.createObjectURL(f);
+  origInfo.textContent=(file.size/1024).toFixed(1)+' KB · '+file.type;doConvert();
+}
+format.addEventListener('change',doConvert);
+async function doConvert(){
+  const img=new Image();img.onload=()=>{
+    const canvas=document.createElement('canvas');canvas.width=img.width;canvas.height=img.height;
+    canvas.getContext('2d').drawImage(img,0,0);
+    canvas.toBlob(b=>{resultBlob=b;conv.src=URL.createObjectURL(b);convInfo.textContent=(b.size/1024).toFixed(1)+' KB · '+format.value;dlBtn.style.display='block';},format.value,0.92);
+  };img.src=orig.src;
+}
+dlBtn.addEventListener('click',()=>{if(!resultBlob)return;const ext=format.value.split('/')[1];const a=document.createElement('a');a.href=URL.createObjectURL(resultBlob);a.download='converted.'+ext;a.click();t('Downloaded!');});
+</script>
+</body>
+</html>

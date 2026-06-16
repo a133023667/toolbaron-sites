@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Hash Generator — MD5, SHA-1, SHA-256 Online | ToolBaron</title><link rel="stylesheet" href="../css/style.css"></head>
+<body>
+<nav><a href="/" class="logo">Tool<span>Baron</span></a></nav>
+<div class="tool-container"><div class="tool-header"><h1>#️⃣ Hash Generator</h1><p>Generate MD5, SHA-1, SHA-256 hashes</p></div>
+<div class="ad-unit">AdSense</div>
+<div style="margin-bottom:12px"><label style="font-size:14px;font-weight:500">Algorithm:</label><select id="algo" style="padding:8px;border:1px solid var(--border);border-radius:8px;font-size:14px;margin-left:8px"><option value="SHA-256">SHA-256</option><option value="SHA-1">SHA-1</option><option value="SHA-512">SHA-512</option></select></div>
+<textarea id="in" placeholder="Paste text here..." style="width:100%;height:150px;font-family:monospace;font-size:13px;padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:12px" oninput="gen()"></textarea>
+<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px"><div style="font-size:13px;color:var(--muted);margin-bottom:4px">HASH</div><textarea id="out" readonly style="width:100%;font-family:monospace;font-size:14px;padding:8px;border:1px solid var(--border);border-radius:6px;background:#f8fafc"></textarea>
+<button class="btn btn-primary" onclick="copy()" style="margin-top:8px">📋 Copy</button></div></div>
+<footer><p>&copy; 2026 ToolBaron</p></footer>
+<div class="toast" id="toast"></div>
+<script>
+async function gen(){const t=document.getElementById('in').value,a=document.getElementById('algo').value;if(!t){document.getElementById('out').value='';return;}const e=new TextEncoder().encode(t);const h=await crypto.subtle.digest(a,e);document.getElementById('out').value=Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('');}
+function copy(){const v=document.getElementById('out').value;if(v){navigator.clipboard.writeText(v);const t=document.getElementById('toast');t.textContent='Copied!';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}}
+</script>
+</body>
+</html>

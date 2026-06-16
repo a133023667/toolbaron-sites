@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UUID Generator — Generate Random UUID v4 Online</title>
+<meta name="description" content="Generate random UUID v4 identifiers instantly. One click to copy.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav><a href="/" class="logo">Tool<span>Baron</span></a><div class="nav-links"><a href="/blog/">Blog</a><a href="/about.html">About</a></div></nav>
+<div class="tool-container">
+  <div class="tool-header"><h1>🆔 UUID Generator</h1><p>Generate random UUID v4 identifiers</p></div>
+  <div class="ad-unit">AdSense — Below Title</div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;text-align:center">
+    <div id="uuid" style="font-size:24px;font-family:monospace;color:var(--text);margin-bottom:20px;word-break:break-all"></div>
+    <button class="btn btn-primary" onclick="gen()">🎲 Generate New</button>
+    <button class="btn btn-green" onclick="copyUuid()">📋 Copy</button>
+  </div>
+</div>
+<footer><p><a href="/privacy.html">Privacy Policy</a> · <a href="/about.html">About</a></p></footer>
+<div class="toast" id="toast"></div>
+<script>
+const el=document.getElementById('uuid'),toast=document.getElementById('toast');
+function gen(){el.textContent=crypto.randomUUID();}
+function copyUuid(){if(!el.textContent)return;navigator.clipboard.writeText(el.textContent);toast.textContent='Copied!';toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2000);}
+gen();
+</script>
+</body>
+</html>

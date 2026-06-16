@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color Converter — HEX, RGB, HSL Online | ToolBaron</title>
+<meta name="description" content="Free color converter. Convert between HEX, RGB, and HSL formats instantly.">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav><a href="/" class="logo">Tool<span>Baron</span></a><div class="nav-links"><a href="https://toolbaron.com">More Tools</a></div></nav>
+<div class="tool-container">
+  <div class="tool-header"><h1>🎨 Color Converter</h1><p>Convert between HEX, RGB, HSL</p></div>
+  <div class="ad-unit">AdSense</div>
+  <div style="background:var(--card);border-radius:8px;padding:16px;border:1px solid var(--border)">
+    <input type="color" id="picker" value="#6366f1" style="width:100%;height:60px;border:none;border-radius:8px;cursor:pointer;margin-bottom:16px">
+    <div style="display:grid;gap:12px;font-size:14px">
+      <div><b>HEX:</b> <input type="text" id="hex" style="padding:6px;border:1px solid var(--border);border-radius:6px;font-family:monospace;width:120px" oninput="fromHEX()"></div>
+      <div><b>RGB:</b> <input type="text" id="rgb" style="padding:6px;border:1px solid var(--border);border-radius:6px;font-family:monospace;width:200px" oninput="fromRGB()"></div>
+      <div><b>HSL:</b> <input type="text" id="hsl" style="padding:6px;border:1px solid var(--border);border-radius:6px;font-family:monospace;width:200px" oninput="fromHSL()"></div>
+    </div>
+  </div>
+</div>
+<footer><p><a href="privacy.html">Privacy</a> · &copy; 2026 ToolBaron</p></footer>
+<script>
+const picker=document.getElementById('picker'),hex=document.getElementById('hex'),rgb=document.getElementById('rgb'),hsl=document.getElementById('hsl');
+function updateAll(c){picker.value=c;hex.value=c;const r=parseInt(c.slice(1,3),16),g=parseInt(c.slice(3,5),16),b=parseInt(c.slice(5,7),16);
+rgb.value=`rgb(${r}, ${g}, ${b})`;
+const rn=r/255,gn=g/255,bn=b/255,max=Math.max(rn,gn,bn),min=Math.min(rn,gn,bn),l=(max+min)/2;
+let h=0,s=0;if(max!==min){const d=max-min;s=l>0.5?d/(2-max-min):d/(max+min);
+if(max===rn)h=((gn-bn)/d+(gn<bn?6:0))/6;else if(max===gn)h=((bn-rn)/d+2)/6;else h=((rn-gn)/d+4)/6;}
+hsl.value=`hsl(${Math.round(h*360)}, ${Math.round(s*100)}%, ${Math.round(l*100)}%)`;}
+function fromHEX(){const v=hex.value.trim();if(/^#[0-9a-fA-F]{6}$/.test(v))updateAll(v);}
+function fromRGB(){const m=rgb.value.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);if(m){const toHex=n=>parseInt(n).toString(16).padStart(2,'0');updateAll('#'+toHex(m[1])+toHex(m[2])+toHex(m[3]));}}
+function fromHSL(){const m=hsl.value.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);if(m){const h=parseInt(m[1])/360,s=parseInt(m[2])/100,l=parseInt(m[3])/100;
+const hue2rgb=(p,q,t)=>{if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p;};
+let r,g,b;if(s===0){r=g=b=l;}else{const q=l<0.5?l*(1+s):l+s-l*s,p=2*l-q;r=hue2rgb(p,q,h+1/3);g=hue2rgb(p,q,h);b=hue2rgb(p,q,h-1/3);}
+const toHex=n=>Math.round(n*255).toString(16).padStart(2,'0');updateAll('#'+toHex(r)+toHex(g)+toHex(b));}}
+picker.addEventListener('input',()=>updateAll(picker.value));updateAll('#6366f1');
+</script>
+</body>
+</html>

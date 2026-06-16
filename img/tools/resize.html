@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Resizer — Resize Images Online for Free</title>
+<meta name="description" content="Free image resizer. Resize images to exact dimensions for social media, websites, or email. 100% browser-based.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav><a href="/" class="logo">Tool<span>Baron</span></a><div class="nav-links"><a href="/blog/">Blog</a><a href="/about.html">About</a></div></nav>
+<div class="tool-container">
+  <div class="tool-header"><h1>📐 Image Resizer</h1><p>Resize images to exact dimensions — no upload needed</p></div>
+  <div class="ad-unit">AdSense — Below Title</div>
+  <div class="upload-zone" id="dropZone">
+    <span class="icon">📁</span><div class="text">Drop image or click to browse</div><div class="hint">JPEG, PNG, WebP — Max 50MB</div>
+  </div>
+  <input type="file" id="fileInput" accept="image/*" style="display:none">
+  <div id="controls" style="display:none;margin-top:16px">
+    <div style="display:flex;gap:12px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
+      <label style="font-weight:500;font-size:14px">Width:</label>
+      <input type="number" id="w" style="width:100px;padding:8px;border:1px solid var(--border);border-radius:8px" placeholder="px">
+      <label style="font-weight:500;font-size:14px">Height:</label>
+      <input type="number" id="h" style="width:100px;padding:8px;border:1px solid var(--border);border-radius:8px" placeholder="px">
+      <label style="font-size:13px"><input type="checkbox" id="lock" checked> Lock aspect ratio</label>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      <span style="font-size:13px;font-weight:500;padding:4px 8px;cursor:pointer;background:var(--border);border-radius:6px" onclick="preset(1200,630)">Twitter</span>
+      <span style="font-size:13px;font-weight:500;padding:4px 8px;cursor:pointer;background:var(--border);border-radius:6px" onclick="preset(1080,1080)">Instagram</span>
+      <span style="font-size:13px;font-weight:500;padding:4px 8px;cursor:pointer;background:var(--border);border-radius:6px" onclick="preset(1200,627)">Facebook</span>
+      <span style="font-size:13px;font-weight:500;padding:4px 8px;cursor:pointer;background:var(--border);border-radius:6px" onclick="preset(1920,1080)">HD</span>
+    </div>
+    <div class="preview-row">
+      <div class="preview-box"><div class="label">Original</div><img id="orig" alt="Original"><div class="file-info" id="origInfo"></div></div>
+      <div class="preview-box"><div class="label">Resized</div><img id="resized" alt="Resized"><div class="file-info" id="resInfo"></div></div>
+    </div>
+    <button class="btn btn-green btn-block" id="dlBtn" style="display:none;margin-top:16px">⬇ Download Resized Image</button>
+  </div>
+</div>
+<footer><p><a href="/privacy.html">Privacy Policy</a> · <a href="/about.html">About</a></p></footer>
+<div class="toast" id="toast"></div>
+<script>
+const dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),controls=document.getElementById('controls');
+const wI=document.getElementById('w'),hI=document.getElementById('h'),lock=document.getElementById('lock');
+const orig=document.getElementById('orig'),resized=document.getElementById('resized'),origInfo=document.getElementById('origInfo'),resInfo=document.getElementById('resInfo'),dlBtn=document.getElementById('dlBtn'),toast=document.getElementById('toast');
+let file,origW,origH,ratio,resultBlob;
+function t(m){toast.textContent=m;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2000);}
+dropZone.addEventListener('click',()=>fileInput.click());
+fileInput.addEventListener('change',e=>{if(e.target.files[0])loadFile(e.target.files[0]);});
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over');});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('drag-over');if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0]);});
+function loadFile(f){
+  file=f;controls.style.display='block';
+  orig.src=URL.createObjectURL(f);
+  const img=new Image();img.onload=()=>{
+    origW=img.width;origH=img.height;ratio=origW/origH;
+    wI.value=origW;hI.value=origH;origInfo.textContent=origW+'×'+origH;
+    doResize();
+  };img.src=orig.src;
+}
+wI.addEventListener('input',()=>{if(lock.checked)hI.value=Math.round(wI.value/ratio);doResize();});
+hI.addEventListener('input',()=>{if(lock.checked)wI.value=Math.round(hI.value*ratio);doResize();});
+lock.addEventListener('change',()=>{if(lock.checked)hI.value=Math.round(wI.value/ratio);});
+function preset(w,h){wI.value=w;hI.value=h;doResize();}
+async function doResize(){
+  const tw=parseInt(wI.value),th=parseInt(hI.value);if(!tw||!th)return;
+  const canvas=document.createElement('canvas');canvas.width=tw;canvas.height=th;
+  const ctx=canvas.getContext('2d');
+  const img=new Image();img.onload=()=>{ctx.drawImage(img,0,0,tw,th);canvas.toBlob(b=>{resultBlob=b;resized.src=URL.createObjectURL(b);resInfo.textContent=tw+'×'+th+' · '+(b.size/1024).toFixed(1)+' KB';dlBtn.style.display='block';},file.type||'image/jpeg',0.9);};
+  img.src=orig.src;
+}
+dlBtn.addEventListener('click',()=>{if(!resultBlob)return;const a=document.createElement('a');a.href=URL.createObjectURL(resultBlob);a.download='resized.'+(file.type.split('/')[1]||'jpg');a.click();t('Downloaded!');});
+</script>
+</body>
+</html>

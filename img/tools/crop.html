@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Cropper — Free Online Crop Tool | ToolBaron</title>
+<meta name="description" content="Free online image cropper. Crop images to any size, fixed ratios for social media. 100% browser-based.">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav><a href="/" class="logo">Tool<span>Baron</span></a><div class="nav-links"><a href="https://toolbaron.com">More Tools</a></div></nav>
+<div class="tool-container">
+  <div class="tool-header"><h1>✂️ Image Cropper</h1><p>Crop images to any size — instant, no upload</p></div>
+  <div class="ad-unit">AdSense</div>
+  <div class="upload-zone" id="dropZone"><span class="icon">📁</span><div class="text">Drop image or click to browse</div></div>
+  <input type="file" id="fileInput" accept="image/*" style="display:none">
+  <div id="controls" style="display:none;margin-top:16px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+      <span style="font-size:13px;font-weight:500;padding:4px 8px;cursor:pointer;background:var(--border);border-radius:6px" onclick="setRatio(1,1)">1:1</span>
+      <span style="font-size:13px;font-weight:500;padding:4px 8px;cursor:pointer;background:var(--border);border-radius:6px" onclick="setRatio(4,3)">4:3</span>
+      <span style="font-size:13px;font-weight:500;padding:4px 8px;cursor:pointer;background:var(--border);border-radius:6px" onclick="setRatio(16,9)">16:9</span>
+      <span style="font-size:13px;font-weight:500;padding:4px 8px;cursor:pointer;background:var(--border);border-radius:6px" onclick="setRatio(3,2)">3:2</span>
+    </div>
+    <div class="preview-row">
+      <div class="preview-box"><div class="label">Original</div><img id="orig" alt="Original" style="max-width:100%"></div>
+      <div class="preview-box"><div class="label">Cropped Preview</div><canvas id="cv" style="max-width:100%;border-radius:8px"></canvas></div>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:12px;align-items:center;flex-wrap:wrap">
+      <label style="font-size:13px">X: <input type="number" id="cx" style="width:60px;padding:4px" value="0"></label>
+      <label style="font-size:13px">Y: <input type="number" id="cy" style="width:60px;padding:4px" value="0"></label>
+      <label style="font-size:13px">W: <input type="number" id="cw" style="width:80px;padding:4px" value="200"></label>
+      <label style="font-size:13px">H: <input type="number" id="ch" style="width:80px;padding:4px" value="200"></label>
+      <button class="btn btn-primary" onclick="applyCrop()">Apply</button>
+    </div>
+    <button class="btn btn-green btn-block" id="dlBtn" style="display:none;margin-top:16px">⬇ Download Cropped</button>
+  </div>
+</div>
+<footer><p><a href="privacy.html">Privacy</a> · &copy; 2026 ToolBaron</p></footer>
+<div class="toast" id="toast"></div>
+<script>
+const dz=document.getElementById('dropZone'),fi=document.getElementById('fileInput'),c=document.getElementById('controls'),orig=document.getElementById('orig'),cv=document.getElementById('cv'),dl=document.getElementById('dlBtn'),toast=document.getElementById('toast');
+let file,imgEl;
+function t(m){toast.textContent=m;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2000);}
+dz.addEventListener('click',()=>fi.click());fi.addEventListener('change',e=>{if(e.target.files[0])load(e.target.files[0]);});
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag-over');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag-over'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag-over');if(e.dataTransfer.files[0])load(e.dataTransfer.files[0]);});
+function load(f){file=f;c.style.display='block';orig.src=URL.createObjectURL(f);imgEl=orig;imgEl.onload=()=>{document.getElementById('cw').value=imgEl.naturalWidth;document.getElementById('ch').value=imgEl.naturalHeight;applyCrop();};}
+function setRatio(rw,rh){
+  const h=parseInt(document.getElementById('ch').value)||200;
+  document.getElementById('cw').value=Math.round(h*rw/rh);
+  applyCrop();
+}
+['cx','cy','cw','ch'].forEach(id=>document.getElementById(id).addEventListener('input',applyCrop));
+function applyCrop(){
+  if(!imgEl||!imgEl.naturalWidth)return;
+  const x=parseInt(document.getElementById('cx').value)||0,y=parseInt(document.getElementById('cy').value)||0,w=parseInt(document.getElementById('cw').value)||100,h=parseInt(document.getElementById('ch').value)||100;
+  const scale=Math.min(400/w,1);
+  cv.width=w*scale;cv.height=h*scale;
+  const ctx=cv.getContext('2d');
+  ctx.drawImage(imgEl,x,y,w,h,0,0,cv.width,cv.height);
+  cv.toBlob(b=>{dl.style.display='block';dl.onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='cropped.'+(file.type.split('/')[1]||'jpg');a.click();t('Downloaded!');};});
+}
+</script>
+</body>
+</html>

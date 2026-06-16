@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Image Compressor — Compress JPEG/PNG/WebP Online</title>
+<meta name="description" content="Compress images without losing quality. Everything runs in your browser — no upload, 100% private. Supports JPEG, PNG, WebP, and more.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🗜</text></svg>">
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo">Tool<span>Baron</span></a>
+  <div class="nav-links">
+    <a href="/blog/">Blog</a>
+    <a href="/about.html">About</a>
+  </div>
+</nav>
+
+<div class="tool-container">
+  <div class="tool-header">
+    <h1>🗜️ Free Image Compressor</h1>
+    <p>Reduce image size up to 90% — no upload, 100% private</p>
+  </div>
+
+  <div class="ad-unit">AdSense — Below Title</div>
+
+  <!-- Drop Zone -->
+  <div class="upload-zone" id="dropZone">
+    <span class="icon">📁</span>
+    <div class="text">Drop image here or click to browse</div>
+    <div class="hint">Supports JPEG, PNG, WebP, AVIF — Max 50MB</div>
+  </div>
+  <input type="file" id="fileInput" accept="image/*" style="display:none">
+
+  <!-- Quality Slider -->
+  <div class="quality-slider" id="qualityRow" style="display:none">
+    <label>Quality:</label>
+    <input type="range" id="quality" min="10" max="100" value="80">
+    <span class="val" id="qualityVal">80%</span>
+  </div>
+
+  <!-- Preview -->
+  <div class="preview-area" id="previewArea">
+    <div class="preview-row">
+      <div class="preview-box">
+        <div class="label">Original</div>
+        <img id="originalImg" alt="Original">
+        <div class="file-info" id="originalInfo"></div>
+      </div>
+      <div class="preview-box">
+        <div class="label">Compressed</div>
+        <img id="compressedImg" alt="Compressed">
+        <div class="file-info" id="compressedInfo"></div>
+      </div>
+    </div>
+    <button class="btn btn-green btn-block" id="downloadBtn" style="display:none">⬇ Download Compressed Image</button>
+  </div>
+
+  <div class="ad-unit">AdSense — Below Tool</div>
+
+  <!-- How it works -->
+  <div style="margin-top:40px;background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid var(--border)">
+    <h2 style="font-size:18px;margin-bottom:12px">How It Works</h2>
+    <ol style="color:var(--muted);font-size:14px;line-height:2;padding-left:20px">
+      <li>Drop or select an image</li>
+      <li>Adjust quality slider (lower = smaller file)</li>
+      <li>Preview the compressed result in real-time</li>
+      <li>Click Download — never leaves your browser</li>
+    </ol>
+    <p style="font-size:13px;color:var(--muted);margin-top:12px">
+      ⚡ All compression happens locally in your browser. Your images are never uploaded to any server.
+      Supports JPEG, PNG, WebP, AVIF, and BMP formats.
+    </p>
+  </div>
+</div>
+
+<footer>
+  <p>
+    <a href="/privacy.html">Privacy Policy</a> ·
+    <a href="/about.html">About</a> ·
+    <a href="/blog/">Blog</a>
+  </p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const previewArea = document.getElementById('previewArea');
+const qualityRow = document.getElementById('qualityRow');
+const qualitySlider = document.getElementById('quality');
+const qualityVal = document.getElementById('qualityVal');
+const originalImg = document.getElementById('originalImg');
+const compressedImg = document.getElementById('compressedImg');
+const originalInfo = document.getElementById('originalInfo');
+const compressedInfo = document.getElementById('compressedInfo');
+const downloadBtn = document.getElementById('downloadBtn');
+const toast = document.getElementById('toast');
+
+let originalFile = null;
+let compressedBlob = null;
+
+function toastMsg(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+dropZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) handleFile(file);
+  else toastMsg('Please drop an image file');
+});
+
+function formatSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(2) + ' MB';
+}
+
+function getOutputFormat(file, quality) {
+  // JPEG for photos, PNG for images with transparency, else WebP
+  if (file.type === 'image/png') return quality < 90 ? 'image/jpeg' : 'image/png';
+  if (file.type === 'image/webp') return 'image/webp';
+  return 'image/jpeg';
+}
+
+async function handleFile(file) {
+  originalFile = file;
+  qualityRow.style.display = 'flex';
+  previewArea.classList.add('active');
+
+  // Show original
+  const origUrl = URL.createObjectURL(file);
+  originalImg.src = origUrl;
+  originalInfo.textContent = `Size: ${formatSize(file.size)} · ${file.type}`;
+
+  await compress(file, parseInt(qualitySlider.value));
+}
+
+async function compress(file, quality) {
+  try {
+    const img = await createImageBitmap(file);
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+
+    const outFormat = getOutputFormat(file, quality);
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, outFormat, quality / 100));
+    compressedBlob = blob;
+
+    const compUrl = URL.createObjectURL(blob);
+    compressedImg.src = compUrl;
+    const pct = Math.round((1 - blob.size / file.size) * 100);
+    compressedInfo.innerHTML = `Size: ${formatSize(blob.size)} · <b style="color:#10b981">-${pct}%</b> · ${outFormat}`;
+    downloadBtn.style.display = 'block';
+  } catch(e) {
+    toastMsg('Compression failed. Try a smaller image.');
+  }
+}
+
+qualitySlider.addEventListener('input', async () => {
+  qualityVal.textContent = qualitySlider.value + '%';
+  if (originalFile) await compress(originalFile, parseInt(qualitySlider.value));
+});
+
+downloadBtn.addEventListener('click', () => {
+  if (!compressedBlob) return;
+  const url = URL.createObjectURL(compressedBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  const ext = compressedBlob.type.split('/')[1] || 'jpg';
+  a.download = 'compressed.' + ext;
+  a.click();
+  URL.revokeObjectURL(url);
+  toastMsg('Downloaded!');
+});
+</script>
+</body>
+</html>

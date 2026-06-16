@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tip Calculator — Free Online Calculator | ToolBaron</title>
+<meta name="description" content="Free online tip calculator. Calculate tip amount, total bill, and split by number of people. Fast, simple, 100% browser-based.">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<nav><a href="https://toolbaron.com" class="logo">Tool<span>Baron</span></a></nav>
+
+<div class="tool-container">
+  <div class="tool-header">
+    <h1>💵 Tip Calculator</h1>
+    <p>Calculate tip and split the bill — no sign-up</p>
+  </div>
+
+  <div class="ad-unit">AdSense</div>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px">
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Bill Amount ($)</label>
+        <input type="number" id="bill" placeholder="e.g. 48.50" step="0.01" min="0" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+      </div>
+      <div style="flex:1;min-width:200px">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Tip Percentage (%)</label>
+        <input type="number" id="tip-pct" placeholder="e.g. 15" value="15" min="0" max="100" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+      </div>
+      <div style="flex:1;min-width:200px">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Split by (people)</label>
+        <input type="number" id="split" placeholder="e.g. 1" value="1" min="1" step="1" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+      </div>
+    </div>
+
+    <!-- Quick tip presets -->
+    <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+      <span style="font-size:13px;color:var(--muted);padding:8px 0">Quick:</span>
+      <button class="btn" onclick="setTip(10)" style="padding:6px 16px;font-size:13px">10%</button>
+      <button class="btn" onclick="setTip(15)" style="padding:6px 16px;font-size:13px">15%</button>
+      <button class="btn" onclick="setTip(18)" style="padding:6px 16px;font-size:13px">18%</button>
+      <button class="btn" onclick="setTip(20)" style="padding:6px 16px;font-size:13px">20%</button>
+      <button class="btn" onclick="setTip(25)" style="padding:6px 16px;font-size:13px">25%</button>
+    </div>
+
+    <button class="btn btn-primary btn-block" onclick="calcTip()">Calculate Tip</button>
+
+    <div id="tip-results" style="display:none;margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">
+      <div style="background:#f8fafc;padding:16px;border-radius:8px;text-align:center"><div style="font-size:12px;color:var(--muted)">Tip Amount</div><div id="tip-amount" style="font-size:22px;font-weight:700;color:var(--green)">—</div></div>
+      <div style="background:#f8fafc;padding:16px;border-radius:8px;text-align:center"><div style="font-size:12px;color:var(--muted)">Total Bill</div><div id="tip-total" style="font-size:22px;font-weight:700">—</div></div>
+      <div style="background:#f8fafc;padding:16px;border-radius:8px;text-align:center"><div style="font-size:12px;color:var(--muted)">Per Person</div><div id="tip-per-person" style="font-size:22px;font-weight:700;color:var(--primary)">—</div></div>
+    </div>
+  </div>
+
+  <div class="ad-unit">AdSense</div>
+</div>
+
+<footer><p><a href="../privacy.html">Privacy</a> · &copy; 2026 ToolBaron</p></footer>
+
+<script>
+function setTip(pct) {
+  document.getElementById('tip-pct').value = pct;
+  calcTip();
+}
+
+function calcTip() {
+  const bill = parseFloat(document.getElementById('bill').value);
+  const tipPct = parseFloat(document.getElementById('tip-pct').value);
+  const split = parseInt(document.getElementById('split').value) || 1;
+
+  const resultsDiv = document.getElementById('tip-results');
+
+  if (isNaN(bill) || bill < 0) {
+    document.getElementById('tip-amount').textContent = '—';
+    document.getElementById('tip-total').textContent = '—';
+    document.getElementById('tip-per-person').textContent = 'Enter bill';
+    return;
+  }
+
+  const tip = bill * (tipPct / 100);
+  const total = bill + tip;
+  const perPerson = total / split;
+
+  document.getElementById('tip-amount').textContent = '$' + tip.toFixed(2);
+  document.getElementById('tip-total').textContent = '$' + total.toFixed(2);
+  document.getElementById('tip-per-person').textContent = '$' + perPerson.toFixed(2);
+  resultsDiv.style.display = 'grid';
+
+  if (split > 1) {
+    document.getElementById('tip-per-person').textContent = '$' + perPerson.toFixed(2) + ' (' + split + ' people)';
+  } else {
+    document.getElementById('tip-per-person').textContent = '$' + perPerson.toFixed(2);
+  }
+}
+</script>
+</body>
+</html>

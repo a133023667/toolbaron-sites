@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JSON Formatter — Pretty Print, Validate, Minify JSON Online</title>
+<meta name="description" content="Free JSON formatter, validator, and minifier. Pretty-print messy JSON in one click. 100% browser-based.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo">Tool<span>Baron</span></a>
+  <div class="nav-links">
+    <a href="/blog/">Blog</a>
+    <a href="/about.html">About</a>
+  </div>
+</nav>
+
+<div class="tool-container">
+  <div class="tool-header">
+    <h1>📋 JSON Formatter</h1>
+    <p>Pretty print, validate, or minify JSON — all in your browser</p>
+  </div>
+
+  <div class="ad-unit">AdSense — Below Title</div>
+
+  <div style="display:flex;gap:8px;margin-bottom:12px">
+    <button class="btn btn-primary" onclick="format()" style="flex:1">Pretty Print</button>
+    <button class="btn" onclick="minify()" style="flex:1;background:#334155;color:#fff">Minify</button>
+    <button class="btn" onclick="clearAll()" style="flex:1;background:#e2e8f0;color:#334155">Clear</button>
+  </div>
+
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <div style="flex:1;min-width:280px">
+      <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px">INPUT</div>
+      <textarea id="input" placeholder='Paste JSON here...' style="width:100%;height:400px;font-family:monospace;font-size:13px;padding:12px;border:1px solid var(--border);border-radius:8px;resize:vertical"></textarea>
+    </div>
+    <div style="flex:1;min-width:280px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:13px;font-weight:600;color:var(--muted)">OUTPUT</span>
+        <span style="font-size:13px;color:var(--muted)" id="status"></span>
+      </div>
+      <textarea id="output" readonly style="width:100%;height:400px;font-family:monospace;font-size:13px;padding:12px;border:1px solid var(--border);border-radius:8px;background:#f8fafc;resize:vertical"></textarea>
+      <button class="btn btn-primary btn-block" onclick="copyOutput()" style="margin-top:8px">📋 Copy Output</button>
+    </div>
+  </div>
+
+  <div class="ad-unit">AdSense — Below Tool</div>
+</div>
+
+<footer>
+  <p>
+    <a href="/privacy.html">Privacy Policy</a> ·
+    <a href="/about.html">About</a> ·
+    <a href="/blog/">Blog</a>
+  </p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const input = document.getElementById('input');
+const output = document.getElementById('output');
+const status = document.getElementById('status');
+const toast = document.getElementById('toast');
+
+function toastMsg(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+function format() {
+  try {
+    const obj = JSON.parse(input.value);
+    output.value = JSON.stringify(obj, null, 2);
+    status.innerHTML = '<span style="color:#10b981">✓ Valid JSON</span>';
+  } catch(e) {
+    status.innerHTML = '<span style="color:#ef4444">✗ ' + e.message + '</span>';
+  }
+}
+
+function minify() {
+  try {
+    const obj = JSON.parse(input.value);
+    output.value = JSON.stringify(obj);
+    status.innerHTML = '<span style="color:#10b981">✓ Minified</span>';
+  } catch(e) {
+    status.innerHTML = '<span style="color:#ef4444">✗ ' + e.message + '</span>';
+  }
+}
+
+function clearAll() {
+  input.value = '';
+  output.value = '';
+  status.textContent = '';
+}
+
+function copyOutput() {
+  if (!output.value) return;
+  navigator.clipboard.writeText(output.value);
+  toastMsg('Copied!');
+}
+</script>
+</body>
+</html>

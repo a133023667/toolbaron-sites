@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Age Calculator — Free Online Calculator | ToolBaron</title>
+<meta name="description" content="Free online age calculator. Calculate your exact age in years, months, and days from your birth date. Instant, accurate, 100% browser-based.">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<nav><a href="https://toolbaron.com" class="logo">Tool<span>Baron</span></a></nav>
+
+<div class="tool-container">
+  <div class="tool-header">
+    <h1>🎂 Age Calculator</h1>
+    <p>Find your exact age in years, months, and days</p>
+  </div>
+
+  <div class="ad-unit">AdSense</div>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px">
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:end;margin-bottom:16px">
+      <div style="flex:1;min-width:200px">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Date of Birth</label>
+        <input type="date" id="birthdate" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+      </div>
+      <div style="flex:1;min-width:200px">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Calculate as of</label>
+        <input type="date" id="enddate" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+      </div>
+      <button class="btn" onclick="setToday()" style="white-space:nowrap">Use Today</button>
+    </div>
+
+    <button class="btn btn-primary btn-block" onclick="calcAge()">Calculate Age</button>
+
+    <div id="age-results" style="display:none;margin-top:20px;text-align:center">
+      <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center">
+        <div style="background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:24px;min-width:120px">
+          <div id="age-years" style="font-size:40px;font-weight:800;color:var(--primary)">—</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:4px">Years</div>
+        </div>
+        <div style="background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:24px;min-width:120px">
+          <div id="age-months" style="font-size:40px;font-weight:800;color:var(--green)">—</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:4px">Months</div>
+        </div>
+        <div style="background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:24px;min-width:120px">
+          <div id="age-days" style="font-size:40px;font-weight:800;color:var(--orange)">—</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:4px">Days</div>
+        </div>
+      </div>
+      <div id="age-summary" style="margin-top:16px;font-size:16px;color:var(--muted)"></div>
+      <div id="age-next-birthday" style="margin-top:8px;font-size:14px;color:var(--text)"></div>
+    </div>
+  </div>
+
+  <div class="ad-unit">AdSense</div>
+</div>
+
+<footer><p><a href="../privacy.html">Privacy</a> · &copy; 2026 ToolBaron</p></footer>
+
+<script>
+// Set today's date as default for end date
+document.getElementById('enddate').valueAsDate = new Date();
+// Set max to today for birth date
+document.getElementById('birthdate').setAttribute('max', new Date().toISOString().split('T')[0]);
+
+function setToday() {
+  document.getElementById('enddate').valueAsDate = new Date();
+  calcAge();
+}
+
+function calcAge() {
+  const birthStr = document.getElementById('birthdate').value;
+  const endStr = document.getElementById('enddate').value;
+  const resultsDiv = document.getElementById('age-results');
+
+  if (!birthStr) {
+    document.getElementById('age-years').textContent = '—';
+    document.getElementById('age-months').textContent = '—';
+    document.getElementById('age-days').textContent = 'Enter birth';
+    document.getElementById('age-summary').textContent = 'Please enter your date of birth.';
+    document.getElementById('age-next-birthday').textContent = '';
+    resultsDiv.style.display = 'block';
+    return;
+  }
+
+  const birth = new Date(birthStr + 'T00:00:00');
+  const end = endStr ? new Date(endStr + 'T00:00:00') : new Date();
+
+  if (birth > end) {
+    document.getElementById('age-years').textContent = '—';
+    document.getElementById('age-months').textContent = '—';
+    document.getElementById('age-days').textContent = '—';
+    document.getElementById('age-summary').textContent = 'Birth date must be before end date.';
+    document.getElementById('age-next-birthday').textContent = '';
+    resultsDiv.style.display = 'block';
+    return;
+  }
+
+  let years = end.getFullYear() - birth.getFullYear();
+  let months = end.getMonth() - birth.getMonth();
+  let days = end.getDate() - birth.getDate();
+
+  if (days < 0) {
+    months--;
+    const prevMonth = new Date(end.getFullYear(), end.getMonth(), 0);
+    days += prevMonth.getDate();
+  }
+
+  if (months < 0) {
+    years--;
+    months += 12;
+  }
+
+  // Total months and days
+  let totalMonths = years * 12 + months;
+  const diffTime = end - birth;
+  const totalDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+  document.getElementById('age-years').textContent = years;
+  document.getElementById('age-months').textContent = totalMonths;
+  document.getElementById('age-days').textContent = totalDays.toLocaleString();
+  document.getElementById('age-summary').textContent = years + ' years, ' + months + ' months, ' + days + ' days';
+
+  // Next birthday
+  const nextBirthday = new Date(end.getFullYear(), birth.getMonth(), birth.getDate());
+  if (nextBirthday <= end) {
+    nextBirthday.setFullYear(nextBirthday.getFullYear() + 1);
+  }
+  const daysUntil = Math.ceil((nextBirthday - end) / (1000 * 60 * 60 * 24));
+  if (daysUntil === 0) {
+    document.getElementById('age-next-birthday').textContent = '🎉 Today is your birthday! Happy birthday!';
+  } else if (daysUntil === 1) {
+    document.getElementById('age-next-birthday').textContent = '🎉 Your next birthday is tomorrow!';
+  } else {
+    document.getElementById('age-next-birthday').textContent = 'Your next birthday is in ' + daysUntil + ' days (on ' + nextBirthday.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'}) + ').';
+  }
+
+  resultsDiv.style.display = 'block';
+}
+</script>
+</body>
+</html>

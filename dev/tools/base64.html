@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Base64 Encoder / Decoder — Free Online Tool</title>
+<meta name="description" content="Free online Base64 encoder and decoder. Encode or decode text to/from Base64 instantly in your browser.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav><a href="/" class="logo">Tool<span>Baron</span></a><div class="nav-links"><a href="/blog/">Blog</a><a href="/about.html">About</a></div></nav>
+<div class="tool-container">
+  <div class="tool-header"><h1>🔐 Base64 Encoder / Decoder</h1><p>Instantly encode or decode Base64 strings</p></div>
+  <div class="ad-unit">AdSense — Below Title</div>
+  <div style="display:flex;gap:8px;margin-bottom:12px">
+    <button class="btn btn-primary" onclick="convert('encode')" style="flex:1">Encode</button>
+    <button class="btn btn-primary" onclick="convert('decode')" style="flex:1">Decode</button>
+    <button class="btn" onclick="swapIO()" style="flex:1;background:#334155;color:#fff">Swap</button>
+  </div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <div style="flex:1;min-width:280px">
+      <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px">INPUT</div>
+      <textarea id="input" placeholder="Paste text or Base64 here..." style="width:100%;height:300px;font-family:monospace;font-size:13px;padding:12px;border:1px solid var(--border);border-radius:8px;resize:vertical"></textarea>
+    </div>
+    <div style="flex:1;min-width:280px">
+      <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px">OUTPUT</div>
+      <textarea id="output" readonly style="width:100%;height:300px;font-family:monospace;font-size:13px;padding:12px;border:1px solid var(--border);border-radius:8px;background:#f8fafc;resize:vertical"></textarea>
+      <button class="btn btn-primary btn-block" onclick="copyOutput()" style="margin-top:8px">📋 Copy</button>
+    </div>
+  </div>
+</div>
+<footer><p><a href="/privacy.html">Privacy Policy</a> · <a href="/about.html">About</a></p></footer>
+<div class="toast" id="toast"></div>
+<script>
+const input=document.getElementById('input'),output=document.getElementById('output'),toast=document.getElementById('toast');
+function t(m){toast.textContent=m;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2000);}
+function convert(mode){
+  try{
+    if(mode==='encode') output.value=btoa(unescape(encodeURIComponent(input.value)));
+    else output.value=decodeURIComponent(escape(atob(input.value)));
+  }catch(e){output.value='Error: '+e.message;}
+}
+function swapIO(){const tmp=input.value;input.value=output.value;output.value=tmp;}
+function copyOutput(){if(!output.value)return;navigator.clipboard.writeText(output.value);t('Copied!');}
+</script>
+</body>
+</html>

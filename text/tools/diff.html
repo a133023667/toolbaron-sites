@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Text Diff — Free Online Text Tool | ToolBaron</title>
+<meta name="description" content="Compare two texts side by side and highlight differences. Free online diff checker, no registration required.">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+.diff-pane { flex: 1; min-width: 280px; }
+.diff-pane textarea { width: 100%; height: 250px; font-family: monospace; font-size: 13px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; resize: vertical; }
+.diff-result { margin-top: 20px; }
+.diff-added { background: #d4edda; color: #155724; }
+.diff-removed { background: #f8d7da; color: #721c24; }
+.diff-line { padding: 2px 8px; font-family: monospace; font-size: 13px; white-space: pre-wrap; word-break: break-all; border-radius: 4px; margin-bottom: 2px; }
+</style>
+</head>
+<body>
+<nav><a href="/" class="logo">Tool<span>Baron</span></a></nav>
+<div class="tool-container">
+  <div class="tool-header"><h1>Text Diff Checker</h1><p>Compare two texts side by side and highlight the differences</p></div>
+  <div class="ad-unit">AdSense</div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <div class="diff-pane">
+      <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px">ORIGINAL TEXT</div>
+      <textarea id="text1" placeholder="Paste original text here..."></textarea>
+    </div>
+    <div class="diff-pane">
+      <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px">MODIFIED TEXT</div>
+      <textarea id="text2" placeholder="Paste modified text here..."></textarea>
+    </div>
+  </div>
+  <button class="btn btn-primary" onclick="runDiff()" style="margin-top:16px">Compare Texts</button>
+  <div id="diffOutput" class="diff-result" style="display:none"></div>
+</div>
+<footer><p><a href="privacy.html">Privacy</a> &middot; &copy; 2026 ToolBaron</p></footer>
+<script>
+function runDiff() {
+  const lines1 = document.getElementById('text1').value.split('\n');
+  const lines2 = document.getElementById('text2').value.split('\n');
+  const out = document.getElementById('diffOutput');
+  out.style.display = 'block';
+  let html = '';
+
+  // Simple line-by-line LCS-based diff
+  const lcs = buildLCS(lines1, lines2);
+  let i = 0, j = 0;
+  for (const entry of lcs) {
+    while (i < entry[0]) { html += '<div class="diff-line diff-removed">- ' + esc(lines1[i]) + '</div>'; i++; }
+    while (j < entry[1]) { html += '<div class="diff-line diff-added">+ ' + esc(lines2[j]) + '</div>'; j++; }
+    html += '<div class="diff-line">  ' + esc(lines1[entry[0]]) + '</div>';
+    i++; j++;
+  }
+  while (i < lines1.length) { html += '<div class="diff-line diff-removed">- ' + esc(lines1[i]) + '</div>'; i++; }
+  while (j < lines2.length) { html += '<div class="diff-line diff-added">+ ' + esc(lines2[j]) + '</div>'; j++; }
+
+  out.innerHTML = html || '<p style="color:var(--muted)">No differences found.</p>';
+}
+function buildLCS(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({length: m+1}, () => new Array(n+1).fill(0));
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
+      dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1] + 1 : Math.max(dp[i-1][j], dp[i][j-1]);
+  const result = [];
+  let i = m, j = n;
+  while (i > 0 && j > 0) {
+    if (a[i-1] === b[j-1]) { result.unshift([i-1, j-1]); i--; j--; }
+    else if (dp[i-1][j] > dp[i][j-1]) i--;
+    else j--;
+  }
+  return result;
+}
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>

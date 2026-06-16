@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discount Calculator — Free Online Calculator | ToolBaron</title>
+<meta name="description" content="Free online discount calculator. Calculate final price after discount, see how much you save. Instant results, 100% browser-based.">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<nav><a href="https://toolbaron.com" class="logo">Tool<span>Baron</span></a></nav>
+
+<div class="tool-container">
+  <div class="tool-header">
+    <h1>🏷️ Discount Calculator</h1>
+    <p>Find the final price after a discount — see how much you save</p>
+  </div>
+
+  <div class="ad-unit">AdSense</div>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px">
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:end">
+      <div style="flex:1;min-width:200px">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Original Price ($)</label>
+        <input type="number" id="orig-price" placeholder="e.g. 79.99" step="0.01" min="0" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+      </div>
+      <div style="flex:1;min-width:200px">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Discount (%)</label>
+        <input type="number" id="discount-pct" placeholder="e.g. 25" min="0" max="100" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+      </div>
+    </div>
+
+    <!-- Quick discount presets -->
+    <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+      <span style="font-size:13px;color:var(--muted);padding:8px 0">Quick:</span>
+      <button class="btn" onclick="setDiscount(10)" style="padding:6px 16px;font-size:13px">10% off</button>
+      <button class="btn" onclick="setDiscount(20)" style="padding:6px 16px;font-size:13px">20% off</button>
+      <button class="btn" onclick="setDiscount(25)" style="padding:6px 16px;font-size:13px">25% off</button>
+      <button class="btn" onclick="setDiscount(30)" style="padding:6px 16px;font-size:13px">30% off</button>
+      <button class="btn" onclick="setDiscount(50)" style="padding:6px 16px;font-size:13px">50% off</button>
+      <button class="btn" onclick="setDiscount(75)" style="padding:6px 16px;font-size:13px">75% off</button>
+    </div>
+
+    <button class="btn btn-primary btn-block" onclick="calcDiscount()">Calculate Discount</button>
+
+    <div id="discount-results" style="display:none;margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">
+      <div style="background:#f8fafc;padding:16px;border-radius:8px;text-align:center"><div style="font-size:12px;color:var(--muted)">You Save</div><div id="saved" style="font-size:22px;font-weight:700;color:var(--green)">—</div></div>
+      <div style="background:#f8fafc;padding:16px;border-radius:8px;text-align:center"><div style="font-size:12px;color:var(--muted)">Final Price</div><div id="final-price" style="font-size:22px;font-weight:700;color:var(--primary)">—</div></div>
+      <div style="background:#f8fafc;padding:16px;border-radius:8px;text-align:center"><div style="font-size:12px;color:var(--muted)">Discount</div><div id="discount-label" style="font-size:22px;font-weight:700;color:var(--orange)">—</div></div>
+    </div>
+  </div>
+
+  <!-- Reverse: what discount % gives this final price? -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px">
+    <h3 style="font-size:16px;margin-bottom:16px">Find the discount % from sale price</h3>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:end">
+      <div style="flex:1;min-width:200px">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Original Price ($)</label>
+        <input type="number" id="orig2" placeholder="e.g. 100" step="0.01" min="0" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+      </div>
+      <div style="flex:1;min-width:200px">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Sale Price ($)</label>
+        <input type="number" id="sale2" placeholder="e.g. 75" step="0.01" min="0" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+      </div>
+      <button class="btn btn-primary" onclick="calcReverseDiscount()" style="white-space:nowrap">Find Discount</button>
+    </div>
+    <div id="result-reverse" style="margin-top:16px;font-size:18px;font-weight:700;min-height:28px"></div>
+  </div>
+
+  <div class="ad-unit">AdSense</div>
+</div>
+
+<footer><p><a href="../privacy.html">Privacy</a> · &copy; 2026 ToolBaron</p></footer>
+
+<script>
+function setDiscount(pct) {
+  document.getElementById('discount-pct').value = pct;
+  calcDiscount();
+}
+
+function calcDiscount() {
+  const price = parseFloat(document.getElementById('orig-price').value);
+  const pct = parseFloat(document.getElementById('discount-pct').value);
+  const resultsDiv = document.getElementById('discount-results');
+
+  if (isNaN(price) || price < 0 || isNaN(pct) || pct < 0) {
+    document.getElementById('saved').textContent = '—';
+    document.getElementById('final-price').textContent = '—';
+    document.getElementById('discount-label').textContent = 'Enter values';
+    resultsDiv.style.display = 'grid';
+    return;
+  }
+
+  if (pct > 100) {
+    document.getElementById('saved').textContent = '—';
+    document.getElementById('final-price').textContent = '—';
+    document.getElementById('discount-label').textContent = 'Max 100%';
+    resultsDiv.style.display = 'grid';
+    return;
+  }
+
+  const saved = price * (pct / 100);
+  const final = price - saved;
+
+  document.getElementById('saved').textContent = '$' + saved.toFixed(2);
+  document.getElementById('final-price').textContent = '$' + final.toFixed(2);
+  document.getElementById('discount-label').textContent = pct + '% off';
+  resultsDiv.style.display = 'grid';
+}
+
+function calcReverseDiscount() {
+  const orig = parseFloat(document.getElementById('orig2').value);
+  const sale = parseFloat(document.getElementById('sale2').value);
+  const el = document.getElementById('result-reverse');
+
+  if (isNaN(orig) || isNaN(sale) || orig <= 0) {
+    el.textContent = 'Please enter both prices.';
+    return;
+  }
+  if (sale > orig) {
+    el.textContent = 'Sale price cannot be higher than original price.';
+    return;
+  }
+  if (sale < 0) {
+    el.textContent = 'Sale price cannot be negative.';
+    return;
+  }
+
+  const pctOff = ((orig - sale) / orig) * 100;
+  el.textContent = 'You saved ' + pctOff.toFixed(2) + '% — that\'s a $' + (orig - sale).toFixed(2) + ' discount!';
+}
+</script>
+</body>
+</html>

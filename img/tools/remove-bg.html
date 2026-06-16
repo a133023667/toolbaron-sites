@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free AI Background Remover — Remove Image Background Instantly</title>
+<meta name="description" content="Remove image backgrounds instantly with AI. Everything runs in your browser — no upload, 100% private.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>✂</text></svg>">
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo">Tool<span>Baron</span></a>
+  <div class="nav-links">
+    <a href="/blog/">Blog</a>
+    <a href="/about.html">About</a>
+  </div>
+</nav>
+
+<div class="tool-container">
+  <div class="tool-header">
+    <h1>✂️ AI Background Remover</h1>
+    <p>Remove image backgrounds in one click — 100% private, runs in your browser</p>
+  </div>
+
+  <div class="ad-unit">AdSense — Below Title</div>
+
+  <div class="upload-zone" id="dropZone">
+    <span class="icon">📸</span>
+    <div class="text">Drop image here or click to browse</div>
+    <div class="hint">First load may take ~10s to download AI model. After that it's instant.</div>
+  </div>
+  <input type="file" id="fileInput" accept="image/*" style="display:none">
+
+  <div class="preview-area" id="previewArea">
+    <div class="preview-row">
+      <div class="preview-box">
+        <div class="label">Original</div>
+        <img id="originalImg" alt="Original">
+      </div>
+      <div class="preview-box" style="background: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22><rect fill=%22%23e0e0e0%22 width=%2210%22 height=%2210%22/><rect fill=%22%23fff%22 x=%2210%22 width=%2210%22 height=%2210%22/><rect fill=%22%23fff%22 y=%2210%22 width=%2210%22 height=%2210%22/><rect fill=%22%23e0e0e0%22 x=%2210%22 y=%2210%22 width=%2210%22 height=%2210%22/></svg>') repeat;">
+        <div class="label">Background Removed</div>
+        <img id="resultImg" alt="Result">
+      </div>
+    </div>
+    <button class="btn btn-green btn-block" id="downloadBtn" style="display:none">⬇ Download PNG (Transparent)</button>
+  </div>
+
+  <div id="loadingMsg" style="display:none;text-align:center;padding:24px;color:var(--muted)">
+    <div style="font-size:32px;margin-bottom:12px">⏳</div>
+    <div>Downloading AI model (~40MB, one-time)...</div>
+    <div style="font-size:13px;margin-top:4px">This runs locally in your browser. Future uses will be instant.</div>
+  </div>
+
+  <div class="ad-unit">AdSense — Below Tool</div>
+
+  <div style="margin-top:40px;background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid var(--border)">
+    <h2 style="font-size:18px;margin-bottom:12px">How It Works</h2>
+    <ol style="color:var(--muted);font-size:14px;line-height:2;padding-left:20px">
+      <li>Drop or select an image with a subject (person, product, etc.)</li>
+      <li>AI model downloads once — then runs entirely in your browser</li>
+      <li>Background is removed automatically</li>
+      <li>Download as PNG with transparent background</li>
+    </ol>
+    <p style="font-size:13px;color:var(--muted);margin-top:12px">
+      ⚡ Powered by MediaPipe — runs 100% locally. Your image never leaves your device.
+      Best results: clear subjects with contrasting backgrounds.
+    </p>
+  </div>
+</div>
+
+<footer>
+  <p>
+    <a href="/privacy.html">Privacy Policy</a> ·
+    <a href="/about.html">About</a> ·
+    <a href="/blog/">Blog</a>
+  </p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.6.0/dist/+esm';
+
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const previewArea = document.getElementById('previewArea');
+const originalImg = document.getElementById('originalImg');
+const resultImg = document.getElementById('resultImg');
+const downloadBtn = document.getElementById('downloadBtn');
+const loadingMsg = document.getElementById('loadingMsg');
+const toast = document.getElementById('toast');
+
+let resultBlob = null;
+
+function toastMsg(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+dropZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) handleFile(file);
+  else toastMsg('Please drop an image file');
+});
+
+async function handleFile(file) {
+  const url = URL.createObjectURL(file);
+  originalImg.src = url;
+  previewArea.classList.add('active');
+  loadingMsg.style.display = 'block';
+  downloadBtn.style.display = 'none';
+
+  try {
+    resultBlob = await removeBackground(file, {
+      progress: (key, current, total) => {
+        // silent
+      }
+    });
+    const resultUrl = URL.createObjectURL(resultBlob);
+    resultImg.src = resultUrl;
+    downloadBtn.style.display = 'block';
+    loadingMsg.style.display = 'none';
+    toastMsg('Background removed!');
+  } catch(e) {
+    loadingMsg.style.display = 'none';
+    toastMsg('Error: ' + e.message);
+  }
+}
+
+downloadBtn.addEventListener('click', () => {
+  if (!resultBlob) return;
+  const url = URL.createObjectURL(resultBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'no-background.png';
+  a.click();
+  URL.revokeObjectURL(url);
+  toastMsg('Downloaded!');
+});
+</script>
+</body>
+</html>
